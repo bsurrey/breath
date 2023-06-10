@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43020DAD2A06A12E00A9236B /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DAC2A06A12E00A9236B /* MainView.swift */; };
+		43020DAF2A06A40D00A9236B /* ExcerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DAE2A06A40D00A9236B /* ExcerciseView.swift */; };
+		43020DB22A06A8EC00A9236B /* BreathingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DB12A06A8EC00A9236B /* BreathingView.swift */; };
+		43020DB42A0728F500A9236B /* CardPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DB32A0728F500A9236B /* CardPreviewView.swift */; };
 		4305AC2F2A05AAB900BCCCD8 /* breathApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */; };
 		4305AC312A05AAB900BCCCD8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC302A05AAB900BCCCD8 /* ContentView.swift */; };
 		4305AC332A05AABA00BCCCD8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4305AC322A05AABA00BCCCD8 /* Assets.xcassets */; };
@@ -16,6 +20,7 @@
 		4305AC462A05AABA00BCCCD8 /* breathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC452A05AABA00BCCCD8 /* breathTests.swift */; };
 		4305AC502A05AABA00BCCCD8 /* breathUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC4F2A05AABA00BCCCD8 /* breathUITests.swift */; };
 		4305AC522A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC512A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift */; };
+		4305AC622A05AB6B00BCCCD8 /* ExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC612A05AB6B00BCCCD8 /* ExercisesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +41,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		43020DAC2A06A12E00A9236B /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		43020DAE2A06A40D00A9236B /* ExcerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExcerciseView.swift; sourceTree = "<group>"; };
+		43020DB12A06A8EC00A9236B /* BreathingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingView.swift; sourceTree = "<group>"; };
+		43020DB32A0728F500A9236B /* CardPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPreviewView.swift; sourceTree = "<group>"; };
 		4305AC2B2A05AAB900BCCCD8 /* breath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breath.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathApp.swift; sourceTree = "<group>"; };
 		4305AC302A05AAB900BCCCD8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -49,6 +58,7 @@
 		4305AC4B2A05AABA00BCCCD8 /* breathUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breathUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4305AC4F2A05AABA00BCCCD8 /* breathUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathUITests.swift; sourceTree = "<group>"; };
 		4305AC512A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		4305AC612A05AB6B00BCCCD8 /* ExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +86,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		43020DB02A06A61000A9236B /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				4305AC322A05AABA00BCCCD8 /* Assets.xcassets */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
 		4305AC222A05AAB900BCCCD8 = {
 			isa = PBXGroup;
 			children = (
@@ -99,13 +117,14 @@
 		4305AC2D2A05AAB900BCCCD8 /* breath */ = {
 			isa = PBXGroup;
 			children = (
-				4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */,
-				4305AC302A05AAB900BCCCD8 /* ContentView.swift */,
-				4305AC322A05AABA00BCCCD8 /* Assets.xcassets */,
-				4305AC372A05AABA00BCCCD8 /* Persistence.swift */,
+				4305AC342A05AABA00BCCCD8 /* Preview Content */,
+				43020DB02A06A61000A9236B /* Assets */,
+				4305AC602A05AB0D00BCCCD8 /* Controller */,
+				4305AC5F2A05AB0300BCCCD8 /* View */,
+				4305AC5E2A05AAFB00BCCCD8 /* Model */,
 				4305AC3C2A05AABA00BCCCD8 /* Info.plist */,
 				4305AC392A05AABA00BCCCD8 /* breath.xcdatamodeld */,
-				4305AC342A05AABA00BCCCD8 /* Preview Content */,
+				4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */,
 			);
 			path = breath;
 			sourceTree = "<group>";
@@ -133,6 +152,34 @@
 				4305AC512A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift */,
 			);
 			path = breathUITests;
+			sourceTree = "<group>";
+		};
+		4305AC5E2A05AAFB00BCCCD8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4305AC5F2A05AB0300BCCCD8 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4305AC302A05AAB900BCCCD8 /* ContentView.swift */,
+				4305AC612A05AB6B00BCCCD8 /* ExercisesView.swift */,
+				43020DAC2A06A12E00A9236B /* MainView.swift */,
+				43020DAE2A06A40D00A9236B /* ExcerciseView.swift */,
+				43020DB12A06A8EC00A9236B /* BreathingView.swift */,
+				43020DB32A0728F500A9236B /* CardPreviewView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4305AC602A05AB0D00BCCCD8 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				4305AC372A05AABA00BCCCD8 /* Persistence.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -266,9 +313,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4305AC382A05AABA00BCCCD8 /* Persistence.swift in Sources */,
+				43020DAD2A06A12E00A9236B /* MainView.swift in Sources */,
 				4305AC3B2A05AABA00BCCCD8 /* breath.xcdatamodeld in Sources */,
+				43020DAF2A06A40D00A9236B /* ExcerciseView.swift in Sources */,
 				4305AC312A05AAB900BCCCD8 /* ContentView.swift in Sources */,
+				43020DB22A06A8EC00A9236B /* BreathingView.swift in Sources */,
+				4305AC622A05AB6B00BCCCD8 /* ExercisesView.swift in Sources */,
 				4305AC2F2A05AAB900BCCCD8 /* breathApp.swift in Sources */,
+				43020DB42A0728F500A9236B /* CardPreviewView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

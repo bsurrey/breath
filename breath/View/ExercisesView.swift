@@ -22,6 +22,21 @@ struct ExercisesView: View {
                 LazyVStack(alignment: .leading, spacing: 20) {
                     ForEach(exercises) { exercise in
                         CardView(exercise: exercise)
+                            .swipeActions(allowsFullSwipe: false) {
+                                Button {
+                                    print("Muting conversation")
+                                } label: {
+                                    Label("Mute", systemImage: "bell.slash.fill")
+                                }
+                                .tint(.indigo)
+                                
+                                Button(role: .destructive) {
+                                    print("Deleting conversation")
+                                } label: {
+                                    Label("Delete", systemImage: "trash.fill")
+                                }
+                            }
+                        
                     }
                 }
                 .padding()
@@ -69,14 +84,14 @@ struct AddItemView: View {
                         }
                         
                         Slider(value: $breathingInDuration, in: 1...10, step: 0.1)
-                                                
+                        
                         HStack {
                             Text("Breathing Out:")
                             Spacer()
                             Text("\(breathingOutDuration, specifier: "%.f") s")
                         }
                         Slider(value: $breathingOutDuration, in: 1...10, step: 0.1)
-
+                        
                         HStack {
                             Text("Repetitions:")
                             Spacer()
@@ -136,7 +151,13 @@ struct AddItemView: View {
             newExercise.updatedTime = Date()
             newExercise.createdTime = Date()
             newExercise.uuid = UUID()
-
+            
+            let rgb = bgColor.toRGB()
+            newExercise.red = rgb.red
+            newExercise.blue = rgb.blue
+            newExercise.green = rgb.green
+            
+            
             do {
                 try viewContext.save()
             } catch {
@@ -203,7 +224,7 @@ struct CardView: View {
             }
             .foregroundColor(.white)
             .padding()
-            .background(Color.red)
+            .background(Color.fromRGB(red: exercise.red, green: exercise.green, blue: exercise.blue))
             .cornerRadius(10)
             .frame(maxWidth: .infinity)
         }

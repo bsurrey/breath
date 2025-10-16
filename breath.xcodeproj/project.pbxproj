@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		43020DAD2A06A12E00A9236B /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DAC2A06A12E00A9236B /* MainView.swift */; };
-		43020DAF2A06A40D00A9236B /* ExcerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DAE2A06A40D00A9236B /* ExcerciseView.swift */; };
 		43020DB22A06A8EC00A9236B /* BreathingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DB12A06A8EC00A9236B /* BreathingView.swift */; };
 		43020DB42A0728F500A9236B /* CardPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DB32A0728F500A9236B /* CardPreviewView.swift */; };
 		4305AC2F2A05AAB900BCCCD8 /* breathApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */; };
@@ -45,7 +44,6 @@
 
 /* Begin PBXFileReference section */
 		43020DAC2A06A12E00A9236B /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		43020DAE2A06A40D00A9236B /* ExcerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExcerciseView.swift; sourceTree = "<group>"; };
 		43020DB12A06A8EC00A9236B /* BreathingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingView.swift; sourceTree = "<group>"; };
 		43020DB32A0728F500A9236B /* CardPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPreviewView.swift; sourceTree = "<group>"; };
 		4305AC2B2A05AAB900BCCCD8 /* breath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breath.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -175,7 +173,6 @@
 				4305AC302A05AAB900BCCCD8 /* ContentView.swift */,
 				4305AC612A05AB6B00BCCCD8 /* ExercisesView.swift */,
 				43020DAC2A06A12E00A9236B /* MainView.swift */,
-				43020DAE2A06A40D00A9236B /* ExcerciseView.swift */,
 				43020DB12A06A8EC00A9236B /* BreathingView.swift */,
 				43020DB32A0728F500A9236B /* CardPreviewView.swift */,
 				439D17B02A509D320071CA48 /* ExerciseSettingsView.swift */,
@@ -324,7 +321,6 @@
 				4305AC382A05AABA00BCCCD8 /* Persistence.swift in Sources */,
 				43020DAD2A06A12E00A9236B /* MainView.swift in Sources */,
 				4305AC3B2A05AABA00BCCCD8 /* breath.xcdatamodeld in Sources */,
-				43020DAF2A06A40D00A9236B /* ExcerciseView.swift in Sources */,
 				4305AC312A05AAB900BCCCD8 /* ContentView.swift in Sources */,
 				43A0F1FF2A5B445600291DE2 /* Color.swift in Sources */,
 				43020DB22A06A8EC00A9236B /* BreathingView.swift in Sources */,
@@ -501,6 +497,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -532,6 +529,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

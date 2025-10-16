@@ -7,19 +7,59 @@
 
 import SwiftUI
 
+private enum MainTab: Hashable {
+    case exercises
+    case settings
+}
+
 struct MainView: View {
+    @State private var selection: MainTab = .exercises
+
     var body: some View {
         NavigationStack {
-            TabView(selection: /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Selection@*/.constant(1)/*@END_MENU_TOKEN@*/) {
+            TabView(selection: $selection) {
                 ExercisesView()
                     .tabItem {
-                        Label("Breathing Exercises", systemImage: "list.bullet")
-                    }.tag(1)
-                
-                Text("Tab Content 2")
+                        Label("Breathing", systemImage: "wind")
+                    }
+                    .tag(MainTab.exercises)
+                    .accessibilityLabel("Breathing Exercises")
+                    .toolbarTitleDisplayMode(.large)
+                    .navigationTitle("Breathing Exercises")
+
+                SettingsView()
                     .tabItem {
                         Label("Settings", systemImage: "gear")
-                    }.tag(3)
+                    }
+                    .tag(MainTab.settings)
+                    .accessibilityLabel("Settings")
+                    .toolbarTitleDisplayMode(.large)
+                    .navigationTitle("Settings")
+            }
+            .tint(.accentColor)
+        }
+    }
+}
+
+private struct SettingsView: View {
+    var body: some View {
+        List {
+            Section("General") {
+                Toggle(isOn: .constant(true)) {
+                    Label("Haptics", systemImage: "waveform")
+                }
+                Toggle(isOn: .constant(false)) {
+                    Label("Sound", systemImage: "speaker.wave.2")
+                }
+            }
+
+            Section("About") {
+                HStack {
+                    Label("Version", systemImage: "info.circle")
+                    Spacer()
+                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }

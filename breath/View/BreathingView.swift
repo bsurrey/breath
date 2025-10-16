@@ -2,294 +2,622 @@
 //  BreathingView.swift
 //  breath
 //
-//  Created by Benjamin Surrey on 06.05.23.
+//  Completely revamped for iOS 26 & Liquid Glass
 //
 
 import SwiftUI
-import AudioToolbox
 
+// MARK: - Main Breathing View
 struct BreathingView: View {
-    // Circle appearance
-    @State private var scale: CGFloat = 0.5
-    @State private var opacity: Double = 1.0
-
-    // States
-    @State private var isRunning = false
-    @State private var isPaused = false
-    @State private var isBreathingIn = true
-    @State private var phaseProgress: Double = 0 // 0..1 within current phase
-
-    // Timer
-    @State private var timer: ResumableTimer?
-    @State private var remainingRounds: Int = 5
-    @State private var remainingTimeForThisPhase: Double = 0 // tenths of a second
-
-    // Data
+    // MARK: - Environment & Data
     @Environment(\.managedObjectContext) private var viewContext
     var exercise: Exercise
-
-    // Ripples
-    @State private var rippleOpacities: [Double] = [0.6, 0.8, 1.0]
-    @State private var rippleScales: [CGFloat] = [0.5, 0.5, 0.5]
-
-    // Settings
-    @State private var showSheet = false
-
-    // Design
-    @State private var themeColor: Color = .black
-
-    private let minScale: CGFloat = 0.5
-    private let maxScale: CGFloat = 0.9 // minScale + 0.4
-
+    
+    // MARK: - Animation State
+    @State private var breathingPhase: BreathPhase = .ready
+    @State private var breathProgress: Double = 0.0
+    @State private var orbScale: CGFloat = 0.65
+    @State private var glowIntensity: Double = 0.0
+    @State private var particleRotation: Double = 0.0
+    
+    // MARK: - Session State
+    @State private var isActive = false
+    @State private var currentRound = 0
+    @State private var totalRounds: Int = 5
+    @State private var phaseTimer: Timer?
+    
+    // MARK: - UI State
+    @State private var showSettings = false
+    @State private var themeColor: Color = .blue
+    
+    // MARK: Action Buttons
+    @State private var addedRound: Bool = false
+    
+    enum BreathPhase: Equatable {
+        case ready, inhale, hold, exhale
+        
+        var title: String {
+            switch self {
+            case .ready: return "Ready"
+            case .inhale: return "Breathe In"
+            case .hold: return "Hold"
+            case .exhale: return "Breathe Out"
+            }
+        }
+        
+        var subtitle: String {
+            switch self {
+            case .ready: return ""
+            case .inhale: return "Fill your lungs"
+            case .hold: return "Keep it steady"
+            case .exhale: return "Release slowly"
+            }
+        }
+    }
+    
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                if isRunning {
-                    Text(isBreathingIn ? "Breathe in" : "Breathe out")
-                        .font(.title)
-                        .fontWeight(.medium)
-                        .accessibilityLabel(isBreathingIn ? "Breathe in" : "Breathe out")
+        ZStack {
+            // Ambient background
+            ambientBackground
+            
+            VStack(spacing: 32) {
+                // Phase text
+                VStack(spacing: 8) {
+                    Text(breathingPhase.title)
+                        .font(.system(size: 32, weight: .semibold, design: .rounded))
+                        .foregroundStyle(themeColor)
+                    
+                    //if breathingPhase.subtitle != "" {
+                        Text(breathingPhase.subtitle)
+                            .font(.system(size: 16, weight: .regular, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    //}
                 }
-            }
-            .frame(height: 44)
-
-            ZStack {
-                if !isRunning {
-                    ForEach(0..<3) { index in
-                        Circle()
-                            .stroke(themeColor, lineWidth: 5)
-                            .scaleEffect(rippleScales[index])
-                            .opacity(isRunning ? 0 : rippleOpacities[index])
-                            .animation(.easeOut(duration: 5)
-                                .repeatForever(autoreverses: false)
-                                .delay(Double(index)), value: rippleScales[index])
-                            .onAppear {
-                                rippleScales[index] = 1.0
-                                rippleOpacities[index] = 0.0
-                            }
-                            .frame(width: 300, height: 300)
-                    }
-                }
-
-                ZStack {
-                    // Progress ring
-                    Circle()
-                        .stroke(themeColor.opacity(0.25), lineWidth: 10)
-                        .frame(width: 280, height: 280)
-                    Circle()
-                        .trim(from: 0, to: CGFloat(phaseProgress))
-                        .stroke(themeColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                        .frame(width: 280, height: 280)
-                        .animation(.linear(duration: 0.1), value: phaseProgress)
-
-                    // Core breathing circle
-                    Circle()
-                        .fill(themeColor)
-                        .frame(width: 220, height: 220)
-                        .scaleEffect(scale)
-                        .opacity(opacity)
-                        .animation(exercise.animations ? .easeInOut(duration: 0.2) : .none, value: scale)
-                        .accessibilityHidden(true)
-                }
-            }
-            .frame(maxWidth: .infinity, minHeight: 360)
-            .padding(.vertical, 24)
-
-            Text("\(remainingRounds) Rounds")
-                .font(.title3)
-                .fontWeight(.regular)
-                .multilineTextAlignment(.center)
-                .padding()
-                .frame(height: 28)
-                .accessibilityLabel("Rounds remaining: \(remainingRounds)")
-
-            Spacer(minLength: 0)
-        }
-        .frame(maxHeight: .infinity, alignment: .top)
-        .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 24) {
-                Button(action: stop) {
-                    Image(systemName: "stop.circle")
-                        .font(.system(size: 32))
-                }
-                .accessibilityLabel("Stop")
-
+                .padding(.horizontal, 32)
+                .padding(.vertical, 20)
+                //.glassBackground(tint: themeColor)
+                .animation(.spring(duration: 0.5, bounce: 0.3), value: breathingPhase)
+                //.glassEffect()
+                
                 Spacer()
-
-                Button(action: {
-                    if !isRunning && !isPaused {
-                        startExercise()
-                    } else if isRunning {
-                        pauseTimer()
-                    } else if isPaused {
-                        resume()
-                    }
-                }) {
-                    Image(systemName: isRunning ? "pause.circle.fill" : "play.circle.fill")
-                        .font(.system(size: 56))
-                        .foregroundColor(themeColor)
-                }
-                .accessibilityLabel(isRunning ? "Pause" : "Play")
-
+                
+                // Main orb
+                breathingOrb
+                    //.frame(height: 280)
+                
                 Spacer()
-
-                Button(action: addRound) {
-                    Image(systemName: "goforward.plus")
-                        .font(.system(size: 32))
-                }
-                .accessibilityLabel("Add round")
+                
+                // Rounds
+                roundsIndicator
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 16)
+                    //.glassBackground(tint: themeColor)
+                    //.glassEffect()
+                
+                Spacer()
+            
+                                
+                                // Control panel
+                //controlBar
+                        //.padding(.bottom, 16)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 12)
-            .padding(.bottom, 12)
-            .background(.ultraThinMaterial)
+            .padding(.vertical, 20)
         }
-        .navigationTitle(exercise.title ?? "")
+        .navigationTitle(exercise.title ?? "Breathe")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .automatic) {
-                Button(action: { showSheet.toggle() }) {
-                    Label { Text("Settings") } icon: { Image(systemName: "info.circle") }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 18, weight: .medium))
+                        .frame(width: 44, height: 44)
                 }
-                .foregroundColor(themeColor)
-                .accessibilityLabel("Settings")
+                .tint(themeColor)
             }
         }
-        .sheet(isPresented: $showSheet) {
+        .toolbar {
+            ToolbarItemGroup(placement: .bottomBar) {
+                GlassEffectContainer(spacing: 24) {
+                    Button {
+                        resetSession()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                    .disabled(!isActive && currentRound == 0)
+                    
+                    // Play/Pause
+                    Button {
+                        toggleBreathing()
+                    } label: {
+                        Image(systemName: isActive ? "pause.fill" : "play.fill")
+                            .contentTransition(.symbolEffect(.replace))
+                    }
+                    .buttonStyle(.glassProminent)
+                    .tint(themeColor)
+                    //.glassButtonStyleProminent()
+                    .sensoryFeedback(.impact(weight: .medium), trigger: isActive)
+                    
+                    //.frame(width: 60, height: 60)
+                    
+                    // Add round
+                    Button {
+                        addRound()
+                        addedRound.toggle()
+                    } label: {
+                        Image(systemName: "plus.arrow.trianglehead.clockwise")
+                            .symbolEffect(.rotate, value: addedRound)
+                    }
+                    .disabled(totalRounds >= 15)
+                    .tint(themeColor)
+                }
+            }
+        }
+        .sheet(isPresented: $showSettings) {
             ExerciseSettingsView()
                 .environmentObject(exercise)
         }
-        .onAppear {
-            themeColor = Color.fromRGB(red: exercise.red, green: exercise.green, blue: exercise.blue)
-            initialize()
-            timer = ResumableTimer(interval: 0.1) { run() }
-        }
-        .onDisappear { destruction() }
+        .onAppear(perform: setup)
+        .onDisappear(perform: cleanup)
     }
-
-    // MARK: - Timer Tick
-    func run() {
-        guard isRunning else { return }
-
-        remainingTimeForThisPhase = max(remainingTimeForThisPhase - 1, 0)
-        let totalPhase = max((isBreathingIn ? exercise.breathingInDuration : exercise.breathingOutDuration) * 10, 1)
-        phaseProgress = 1 - (remainingTimeForThisPhase / totalPhase)
-
-        if remainingTimeForThisPhase == 0 {
-            // Phase complete -> toggle breath direction or finish round
-            isBreathingIn.toggle()
-
-            if isBreathingIn {
-                // Completed an OUT phase -> round finished
-                remainingRounds = max(remainingRounds - 1, 0)
-            }
-
-            if remainingRounds == 0 {
-                stop()
-                return
-            }
-
-            remainingTimeForThisPhase = (isBreathingIn ? exercise.breathingInDuration : exercise.breathingOutDuration) * 10
-            phaseProgress = 0
+    
+    // MARK: - Ambient Background
+    private var ambientBackground: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    themeColor.opacity(0.06),
+                    themeColor.opacity(0.12),
+                    themeColor.opacity(0.04)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            
+            // Breathing glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            themeColor.opacity(0.15 * glowIntensity),
+                            .clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 350
+                    )
+                )
+                .frame(width: 700, height: 700)
+                .blur(radius: 100)
+                .scaleEffect(orbScale)
         }
-
-        let total = max((isBreathingIn ? exercise.breathingInDuration : exercise.breathingOutDuration) * 10, 1)
-        let newScale = getScale(remainingTime: remainingTimeForThisPhase, totalTime: total, isBreathingIn: isBreathingIn)
-        withAnimation(exercise.animations ? .easeInOut(duration: 0.1) : .none) {
-            scale = newScale
+        .ignoresSafeArea()
+    }
+    
+    // MARK: - Breathing Orb
+    private var breathingOrb: some View {
+        ZStack {
+            // Progress ring
+            Circle()
+                .stroke(themeColor.opacity(0.12), lineWidth: 6)
+                .frame(width: 300, height: 300)
+            
+            
+            Circle()
+                .trim(from: 0, to: breathProgress)
+                .stroke(
+                    themeColor,
+                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                )
+                .frame(width: 300, height: 300)
+                .rotationEffect(.degrees(-90))
+            
+            // Animated particles
+            ForEach(0..<8, id: \.self) { index in
+                Circle()
+                    .fill(themeColor.opacity(0.3))
+                    .frame(width: 8, height: 8)
+                    .offset(y: -120)
+                    .rotationEffect(.degrees(Double(index) * 45 + particleRotation))
+                    .blur(radius: 2)
+                
+            }
+            
+            // Main breathing sphere
+            ZStack {
+                // Glow layers
+                ForEach(0..<3, id: \.self) { layer in
+                    Circle()
+                        .fill(themeColor.opacity(0.15 - Double(layer) * 0.05))
+                        .frame(width: 240, height: 240)
+                        .blur(radius: 20 + Double(layer) * 10)
+                        .scaleEffect(orbScale * (1.0 + Double(layer) * 0.1))
+                }
+                
+                // Core orb
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                themeColor.opacity(0.9),
+                                themeColor.opacity(0.75),
+                                themeColor.opacity(0.6)
+                            ],
+                            center: UnitPoint(x: 0.4, y: 0.4),
+                            startRadius: 0,
+                            endRadius: 120
+                        )
+                    )
+                    .frame(width: 240, height: 240)
+                    .overlay {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        .white.opacity(0.25),
+                                        .clear
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .center
+                                )
+                            )
+                    }
+                    
+                    /*
+                     .shadow(
+                         color: themeColor.opacity(0.3 * glowIntensity),
+                         radius: 30,
+                         y: 10
+                     )
+                     */
+                
+                // Center percentage
+                if false && isActive {
+                    Text("\(Int(breathProgress * 100))%")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
+                }
+            }
+            .glassEffect()
+            .scaleEffect(orbScale)
+            .glassBackground(tint: themeColor, isCircle: true)
         }
     }
-
-    // MARK: - Helpers
-    func getScale(remainingTime: Double, totalTime: Double, isBreathingIn: Bool) -> CGFloat {
-        let remaining = max(remainingTime - 1, 0)
-        let delta = maxScale - minScale // 0.4
-        if totalTime <= 0 { return minScale }
-        if isBreathingIn {
-            let progress = (totalTime - remaining) / totalTime
-            return min(max(minScale + delta * progress, minScale), maxScale)
+    
+    // MARK: - Rounds Indicator
+    private var roundsIndicator: some View {
+        HStack(spacing: 12) {
+            ForEach(0..<totalRounds, id: \.self) { index in
+                Circle()
+                    .fill(index < currentRound ? themeColor : themeColor.opacity(0.25))
+                    .frame(width: 8, height: 8)
+                    .overlay {
+                        if index == currentRound && isActive {
+                            Circle()
+                                .stroke(themeColor, lineWidth: 2)
+                                .frame(width: 16, height: 16)
+                        }
+                    }
+                    .animation(.spring(duration: 0.4, bounce: 0.4), value: currentRound)
+            }
+        }
+    }
+    
+    // MARK: - Control Bar
+    private var controlBar: some View {
+        HStack(spacing: 28) {
+            // Reset
+            Button {
+                resetSession()
+            } label: {
+                Image(systemName: "arrow.counterclockwise")
+                    .font(.system(size: 20, weight: .semibold))
+                    .frame(width: 54, height: 54)
+            }
+            .tint(themeColor)
+            .glassButtonStyle()
+            .disabled(!isActive && currentRound == 0)
+            
+            Spacer()
+            
+            // Play/Pause
+            Button {
+                toggleBreathing()
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(themeColor.opacity(0.18))
+                        .frame(width: 72, height: 72)
+                    
+                    Image(systemName: isActive ? "pause.fill" : "play.fill")
+                        .font(.system(size: 26, weight: .bold))
+                        .contentTransition(.symbolEffect(.replace))
+                }
+            }
+            .tint(themeColor)
+            .glassButtonStyleProminent()
+            .sensoryFeedback(.impact(weight: .medium), trigger: isActive)
+            
+            Spacer()
+            
+            // Add round
+            Button {
+                addRound()
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .frame(width: 54, height: 54)
+            }
+            .tint(themeColor)
+            .glassButtonStyle()
+        }
+        .padding(.horizontal, 32)
+        .padding(.vertical, 16)
+        .background(.ultraThinMaterial)
+    }
+    
+    // MARK: - Setup & Lifecycle
+    private func setup() {
+        themeColor = Color.fromRGB(
+            red: exercise.red,
+            green: exercise.green,
+            blue: exercise.blue
+        )
+        totalRounds = Int(exercise.repetitions)
+        startAmbientAnimation()
+    }
+    
+    private func cleanup() {
+        phaseTimer?.invalidate()
+    }
+    
+    private func startAmbientAnimation() {
+        withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
+            particleRotation = 360
+        }
+    }
+    
+    // MARK: - Actions
+    private func toggleBreathing() {
+        if isActive {
+            pauseBreathing()
         } else {
-            let progress = remaining / totalTime
-            return min(max(minScale + delta * progress, minScale), maxScale)
+            startBreathing()
         }
     }
-
-    func initialize() {
-        remainingRounds = max(Int(exercise.repetitions), 0)
-        remainingTimeForThisPhase = max(exercise.breathingInDuration * 10, 0)
-        isPaused = false
-        isRunning = false
-        isBreathingIn = true
-        phaseProgress = 0
-
-        scale = minScale
-        opacity = 1.0
+    
+    private func startBreathing() {
+        isActive = true
+        if breathingPhase == .ready {
+            currentRound = 0
+            breathingPhase = .inhale
+        }
+        animateBreathCycle()
     }
-
-    func startExercise() {
-        isRunning = true
-        isPaused = false
-        remainingTimeForThisPhase = (isBreathingIn ? exercise.breathingInDuration : exercise.breathingOutDuration) * 10
-        timer?.start()
+    
+    private func pauseBreathing() {
+        isActive = false
+        phaseTimer?.invalidate()
     }
-
-    func reset() {
-        timer?.reset()
-        initialize()
+    
+    private func resetSession() {
+        isActive = false
+        phaseTimer?.invalidate()
+        currentRound = 0
+        breathingPhase = .ready
+        
+        withAnimation(.spring(duration: 0.8, bounce: 0.3)) {
+            breathProgress = 0
+            orbScale = 0.65
+            glowIntensity = 0
+        }
     }
-
-    func addRound() {
-        remainingRounds += 1
+    
+    private func addRound() {
+        totalRounds += 1
+        
+        #if os(iOS)
+        if exercise.animations {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
+        #endif
     }
-
-    func pauseTimer() {
-        timer?.pause()
-        isRunning = false
-        isPaused = true
+    
+    // MARK: - Breathing Animation
+    private func animateBreathCycle() {
+        guard isActive else { return }
+        
+        let inhale = max(exercise.breathingInDuration, 1.0)
+        let exhale = max(exercise.breathingOutDuration, 1.0)
+        let hold = 1.5
+        
+        switch breathingPhase {
+        case .ready:
+            breathingPhase = .inhale
+            animateBreathCycle()
+            
+        case .inhale:
+            withAnimation(.spring(duration: inhale, bounce: 0.15)) {
+                orbScale = 0.95
+                glowIntensity = 1.0
+                breathProgress = 1.0
+            }
+            
+            phaseTimer = Timer.scheduledTimer(withTimeInterval: inhale, repeats: false) { _ in
+                breathingPhase = .hold
+                animateBreathCycle()
+            }
+            
+        case .hold:
+            withAnimation(.spring(duration: hold, bounce: 0)) {
+                orbScale = 0.95
+                glowIntensity = 0.85
+            }
+            
+            phaseTimer = Timer.scheduledTimer(withTimeInterval: hold, repeats: false) { _ in
+                breathingPhase = .exhale
+                animateBreathCycle()
+            }
+            
+        case .exhale:
+            withAnimation(.spring(duration: exhale, bounce: 0.15)) {
+                orbScale = 0.65
+                glowIntensity = 0.2
+                breathProgress = 0
+            }
+            
+            phaseTimer = Timer.scheduledTimer(withTimeInterval: exhale, repeats: false) { _ in
+                currentRound += 1
+                
+                #if os(iOS)
+                if self.exercise.animations {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                }
+                #endif
+                
+                if currentRound >= totalRounds {
+                    completeSession()
+                } else {
+                    breathingPhase = .inhale
+                    animateBreathCycle()
+                }
+            }
+        }
     }
-
-    func stop() {
-        timer?.invalidate()
-        initialize()
-    }
-
-    func resume() {
-        isRunning = true
-        isPaused = false
-        timer?.start() // ensure timer fires again
-    }
-
-    func destruction() {
-        timer?.invalidate()
+    
+    private func completeSession() {
+        isActive = false
+        breathingPhase = .ready
+        
+        withAnimation(.spring(duration: 1.0, bounce: 0.35)) {
+            breathProgress = 0
+            orbScale = 0.65
+            glowIntensity = 0
+        }
+        
+        #if os(iOS)
+        if exercise.animations {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        }
+        #endif
     }
 }
 
+// MARK: - Glass Effect Modifiers (iOS 26 Compatible)
+extension View {
+    @ViewBuilder
+    func glassBackground(tint: Color, isCircle: Bool = false) -> some View {
+        if #available(iOS 26, *) {
+            if isCircle {
+                self.background {
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .overlay {
+                            Circle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            tint.opacity(0.15),
+                                            tint.opacity(0.08),
+                                            .clear
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                        }
+                        .overlay {
+                            Circle()
+                                .stroke(.white.opacity(0.15), lineWidth: 1)
+                        }
+                        .shadow(color: .black.opacity(0.08), radius: 20, y: 8)
+                }
+            } else {
+                self.background {
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            tint.opacity(0.12),
+                                            tint.opacity(0.06),
+                                            .clear
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                .stroke(.white.opacity(0.15), lineWidth: 0.5)
+                        }
+                        .shadow(color: .black.opacity(0.06), radius: 15, y: 6)
+                }
+            }
+        } else {
+            self.background {
+                if isCircle {
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                } else {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func glassButtonStyle() -> some View {
+        if #available(iOS 26, *) {
+            self.buttonStyle(.glass)
+        } else {
+            self.buttonStyle(.bordered)
+        }
+    }
+    
+    @ViewBuilder
+    func glassButtonStyleProminent() -> some View {
+        if #available(iOS 26, *) {
+            self.buttonStyle(.glassProminent)
+        } else {
+            self.buttonStyle(.borderedProminent)
+        }
+    }
+}
+
+// MARK: - Preview
 struct BreathingView_Previews: PreviewProvider {
     static var previews: some View {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-        let newEx = Exercise(context: viewContext)
-        newEx.uuid = UUID()
-        newEx.animations = true
-        newEx.breathingInDuration = 4.0
-        newEx.breathingOutDuration = 7.0
-        newEx.color = ".black"
-        newEx.createdTime = Date()
-        newEx.favorite = false
-        newEx.repetitions = 5
-        newEx.updatedTime = Date()
-        newEx.title = "4 - 7 - 4"
+        let exercise = Exercise(context: viewContext)
+        exercise.uuid = UUID()
+        exercise.animations = true
+        exercise.breathingInDuration = 4.0
+        exercise.breathingOutDuration = 6.0
+        exercise.color = ".blue"
+        exercise.createdTime = Date()
+        exercise.favorite = false
+        exercise.repetitions = 5
+        exercise.updatedTime = Date()
+        exercise.title = "Calm Breathing"
         
-        let rgb = Color.green.toRGB()
-        newEx.red = rgb.red
-        newEx.blue = rgb.blue
-        newEx.green = rgb.green
+        let rgb = Color.blue.toRGB()
+        exercise.red = rgb.red
+        exercise.blue = rgb.blue
+        exercise.green = rgb.green
         
         return NavigationView {
-            BreathingView(exercise: newEx)
+            BreathingView(exercise: exercise)
                 .environment(\.managedObjectContext, viewContext)
         }
+        .preferredColorScheme(.light)
     }
 }

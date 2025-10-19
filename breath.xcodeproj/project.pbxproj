@@ -3,27 +3,8 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
-
-/* Begin PBXBuildFile section */
-		43020DAD2A06A12E00A9236B /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DAC2A06A12E00A9236B /* MainView.swift */; };
-		43020DB22A06A8EC00A9236B /* BreathingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DB12A06A8EC00A9236B /* BreathingView.swift */; };
-		43020DB42A0728F500A9236B /* CardPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43020DB32A0728F500A9236B /* CardPreviewView.swift */; };
-		4305AC2F2A05AAB900BCCCD8 /* breathApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */; };
-		4305AC312A05AAB900BCCCD8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC302A05AAB900BCCCD8 /* ContentView.swift */; };
-		4305AC332A05AABA00BCCCD8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4305AC322A05AABA00BCCCD8 /* Assets.xcassets */; };
-		4305AC362A05AABA00BCCCD8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4305AC352A05AABA00BCCCD8 /* Preview Assets.xcassets */; };
-		4305AC382A05AABA00BCCCD8 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC372A05AABA00BCCCD8 /* Persistence.swift */; };
-		4305AC3B2A05AABA00BCCCD8 /* breath.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC392A05AABA00BCCCD8 /* breath.xcdatamodeld */; };
-		4305AC462A05AABA00BCCCD8 /* breathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC452A05AABA00BCCCD8 /* breathTests.swift */; };
-		4305AC502A05AABA00BCCCD8 /* breathUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC4F2A05AABA00BCCCD8 /* breathUITests.swift */; };
-		4305AC522A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC512A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift */; };
-		4305AC622A05AB6B00BCCCD8 /* ExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4305AC612A05AB6B00BCCCD8 /* ExercisesView.swift */; };
-		439D17B12A509D320071CA48 /* ExerciseSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439D17B02A509D320071CA48 /* ExerciseSettingsView.swift */; };
-		439D17B32A50A8E40071CA48 /* ResumableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439D17B22A50A8E40071CA48 /* ResumableTimer.swift */; };
-		43A0F1FF2A5B445600291DE2 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A0F1FE2A5B445600291DE2 /* Color.swift */; };
-/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		4305AC422A05AABA00BCCCD8 /* PBXContainerItemProxy */ = {
@@ -43,27 +24,26 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		43020DAC2A06A12E00A9236B /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		43020DB12A06A8EC00A9236B /* BreathingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingView.swift; sourceTree = "<group>"; usesTabs = 1; };
-		43020DB32A0728F500A9236B /* CardPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPreviewView.swift; sourceTree = "<group>"; };
 		4305AC2B2A05AAB900BCCCD8 /* breath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breath.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathApp.swift; sourceTree = "<group>"; };
-		4305AC302A05AAB900BCCCD8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		4305AC322A05AABA00BCCCD8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		4305AC352A05AABA00BCCCD8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		4305AC372A05AABA00BCCCD8 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
-		4305AC3A2A05AABA00BCCCD8 /* breath.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = breath.xcdatamodel; sourceTree = "<group>"; };
-		4305AC3C2A05AABA00BCCCD8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4305AC412A05AABA00BCCCD8 /* breathTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breathTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4305AC452A05AABA00BCCCD8 /* breathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathTests.swift; sourceTree = "<group>"; };
 		4305AC4B2A05AABA00BCCCD8 /* breathUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = breathUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4305AC4F2A05AABA00BCCCD8 /* breathUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathUITests.swift; sourceTree = "<group>"; };
-		4305AC512A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		4305AC612A05AB6B00BCCCD8 /* ExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisesView.swift; sourceTree = "<group>"; };
-		439D17B02A509D320071CA48 /* ExerciseSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSettingsView.swift; sourceTree = "<group>"; };
-		439D17B22A50A8E40071CA48 /* ResumableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResumableTimer.swift; sourceTree = "<group>"; };
-		43A0F1FE2A5B445600291DE2 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		437954402EA48C7200FED092 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4305AC2A2A05AAB900BCCCD8 /* breath */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		437954302EA48C7200FED092 /* breath */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (437954402EA48C7200FED092 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = breath; sourceTree = "<group>"; };
+		437954422EA48C7C00FED092 /* breathTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = breathTests; sourceTree = "<group>"; };
+		437954462EA48C8000FED092 /* breathUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = breathUITests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		4305AC282A05AAB900BCCCD8 /* Frameworks */ = {
@@ -90,20 +70,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		43020DB02A06A61000A9236B /* Assets */ = {
-			isa = PBXGroup;
-			children = (
-				4305AC322A05AABA00BCCCD8 /* Assets.xcassets */,
-			);
-			path = Assets;
-			sourceTree = "<group>";
-		};
 		4305AC222A05AAB900BCCCD8 = {
 			isa = PBXGroup;
 			children = (
-				4305AC2D2A05AAB900BCCCD8 /* breath */,
-				4305AC442A05AABA00BCCCD8 /* breathTests */,
-				4305AC4E2A05AABA00BCCCD8 /* breathUITests */,
+				437954302EA48C7200FED092 /* breath */,
+				437954422EA48C7C00FED092 /* breathTests */,
+				437954462EA48C8000FED092 /* breathUITests */,
 				4305AC2C2A05AAB900BCCCD8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -116,76 +88,6 @@
 				4305AC4B2A05AABA00BCCCD8 /* breathUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		4305AC2D2A05AAB900BCCCD8 /* breath */ = {
-			isa = PBXGroup;
-			children = (
-				4305AC342A05AABA00BCCCD8 /* Preview Content */,
-				43020DB02A06A61000A9236B /* Assets */,
-				4305AC602A05AB0D00BCCCD8 /* Controller */,
-				4305AC5F2A05AB0300BCCCD8 /* View */,
-				4305AC5E2A05AAFB00BCCCD8 /* Model */,
-				4305AC3C2A05AABA00BCCCD8 /* Info.plist */,
-				4305AC392A05AABA00BCCCD8 /* breath.xcdatamodeld */,
-				4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */,
-				439D17B22A50A8E40071CA48 /* ResumableTimer.swift */,
-				43A0F1FE2A5B445600291DE2 /* Color.swift */,
-			);
-			path = breath;
-			sourceTree = "<group>";
-		};
-		4305AC342A05AABA00BCCCD8 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				4305AC352A05AABA00BCCCD8 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		4305AC442A05AABA00BCCCD8 /* breathTests */ = {
-			isa = PBXGroup;
-			children = (
-				4305AC452A05AABA00BCCCD8 /* breathTests.swift */,
-			);
-			path = breathTests;
-			sourceTree = "<group>";
-		};
-		4305AC4E2A05AABA00BCCCD8 /* breathUITests */ = {
-			isa = PBXGroup;
-			children = (
-				4305AC4F2A05AABA00BCCCD8 /* breathUITests.swift */,
-				4305AC512A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift */,
-			);
-			path = breathUITests;
-			sourceTree = "<group>";
-		};
-		4305AC5E2A05AAFB00BCCCD8 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		4305AC5F2A05AB0300BCCCD8 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				4305AC302A05AAB900BCCCD8 /* ContentView.swift */,
-				4305AC612A05AB6B00BCCCD8 /* ExercisesView.swift */,
-				43020DAC2A06A12E00A9236B /* MainView.swift */,
-				43020DB12A06A8EC00A9236B /* BreathingView.swift */,
-				43020DB32A0728F500A9236B /* CardPreviewView.swift */,
-				439D17B02A509D320071CA48 /* ExerciseSettingsView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		4305AC602A05AB0D00BCCCD8 /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-				4305AC372A05AABA00BCCCD8 /* Persistence.swift */,
-			);
-			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,6 +104,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				437954302EA48C7200FED092 /* breath */,
 			);
 			name = breath;
 			productName = breath;
@@ -221,6 +126,9 @@
 			dependencies = (
 				4305AC432A05AABA00BCCCD8 /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				437954422EA48C7C00FED092 /* breathTests */,
+			);
 			name = breathTests;
 			productName = breathTests;
 			productReference = 4305AC412A05AABA00BCCCD8 /* breathTests.xctest */;
@@ -238,6 +146,9 @@
 			);
 			dependencies = (
 				4305AC4D2A05AABA00BCCCD8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				437954462EA48C8000FED092 /* breathUITests */,
 			);
 			name = breathUITests;
 			productName = breathUITests;
@@ -292,8 +203,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4305AC362A05AABA00BCCCD8 /* Preview Assets.xcassets in Resources */,
-				4305AC332A05AABA00BCCCD8 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,17 +227,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4305AC382A05AABA00BCCCD8 /* Persistence.swift in Sources */,
-				43020DAD2A06A12E00A9236B /* MainView.swift in Sources */,
-				4305AC3B2A05AABA00BCCCD8 /* breath.xcdatamodeld in Sources */,
-				4305AC312A05AAB900BCCCD8 /* ContentView.swift in Sources */,
-				43A0F1FF2A5B445600291DE2 /* Color.swift in Sources */,
-				43020DB22A06A8EC00A9236B /* BreathingView.swift in Sources */,
-				439D17B12A509D320071CA48 /* ExerciseSettingsView.swift in Sources */,
-				4305AC622A05AB6B00BCCCD8 /* ExercisesView.swift in Sources */,
-				4305AC2F2A05AAB900BCCCD8 /* breathApp.swift in Sources */,
-				439D17B32A50A8E40071CA48 /* ResumableTimer.swift in Sources */,
-				43020DB42A0728F500A9236B /* CardPreviewView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,7 +234,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4305AC462A05AABA00BCCCD8 /* breathTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,8 +241,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4305AC522A05AABA00BCCCD8 /* breathUITestsLaunchTests.swift in Sources */,
-				4305AC502A05AABA00BCCCD8 /* breathUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -546,7 +441,6 @@
 		4305AC592A05AABA00BCCCD8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -566,7 +460,6 @@
 		4305AC5A2A05AABA00BCCCD8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -586,7 +479,6 @@
 		4305AC5C2A05AABA00BCCCD8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3VL3FJXX72;
@@ -604,7 +496,6 @@
 		4305AC5D2A05AABA00BCCCD8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3VL3FJXX72;
@@ -659,19 +550,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		4305AC392A05AABA00BCCCD8 /* breath.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				4305AC3A2A05AABA00BCCCD8 /* breath.xcdatamodel */,
-			);
-			currentVersion = 4305AC3A2A05AABA00BCCCD8 /* breath.xcdatamodel */;
-			path = breath.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 4305AC232A05AAB900BCCCD8 /* Project object */;
 }

@@ -1,61 +1,11 @@
 //
-//  ExercisesView.swift
+//  Create.swift
 //  breath
 //
-//  Created by Benjamin Surrey on 05.05.23.
+//  Created by Benjamin on 19.10.25.
 //
 
 import SwiftUI
-
-struct ExercisesView: View {
-    @State private var showingAddItemView = false
-    @Environment(\.managedObjectContext) private var viewContext
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Exercise.createdTime, ascending: true)],
-        animation: .default)
-    private var exercises: FetchedResults<Exercise>
-    
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 20) {
-                    ForEach(exercises) { exercise in
-                        CardView(exercise: exercise)
-                            .swipeActions(allowsFullSwipe: false) {
-                                Button {
-                                    print("Muting conversation")
-                                } label: {
-                                    Label("Mute", systemImage: "bell.slash.fill")
-                                }
-                                .tint(.indigo)
-                                
-                                Button(role: .destructive) {
-                                    print("Deleting conversation")
-                                } label: {
-                                    Label("Delete", systemImage: "trash.fill")
-                                }
-                            }
-                        
-                    }
-                }
-                .padding()
-            }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Mindfull Exercises")
-            .toolbar {
-                ToolbarItem {
-                    Button(action: { showingAddItemView.toggle() }) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            .sheet(isPresented: $showingAddItemView) {
-                AddItemView()
-            }
-        }
-    }
-}
 
 struct AddItemView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -167,73 +117,5 @@ struct AddItemView: View {
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
-    }
-}
-
-struct CardView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    var exercise: Exercise
-    
-    var body: some View {
-        NavigationLink(destination: BreathingView(exercise: exercise)) {
-            VStack(alignment: .leading, spacing: 10) {
-                VStack {
-                    HStack {
-                        Text(exercise.title ?? "Exercise")
-                            .font(.body)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(1)
-                            .bold()
-                        
-                        Spacer()
-                        
-                        Label {
-                            Text("~ \(ceil((exercise.breathingInDuration + exercise.breathingOutDuration) * Double(exercise.repetitions) / 60), specifier: "%.f") min")
-                        } icon: {
-                            Image(systemName: "clock")
-                        }
-                    }.padding(.bottom)
-                    
-                    
-                    Spacer()
-                    
-                    HStack {
-                        Label {
-                            Text("\(exercise.breathingInDuration, specifier: "%.f") s in")
-                        } icon: {
-                            Image(systemName: "wind.circle")
-                        }
-                        
-                        Spacer()
-                        
-                        Label {
-                            Text("\(exercise.breathingOutDuration, specifier: "%.f") s out")
-                        } icon: {
-                            Image(systemName: "wind.circle")
-                        }
-                        
-                        Spacer()
-                        
-                        Label {
-                            Text("\(exercise.repetitions) x")
-                        } icon: {
-                            Image(systemName: "repeat")
-                        }
-                    }
-                }
-            }
-            .foregroundColor(.white)
-            .padding()
-            .background(Color.fromRGB(red: exercise.red, green: exercise.green, blue: exercise.blue))
-            .cornerRadius(10)
-            .frame(maxWidth: .infinity)
-        }
-    }
-}
-
-struct ExercisesView_Previews: PreviewProvider {
-    static var previews: some View {
-        ExercisesView()
-            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

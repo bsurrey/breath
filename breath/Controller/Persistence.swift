@@ -22,6 +22,7 @@ struct PersistenceController {
             newEx.updatedTime = Date()
             newEx.createdTime = Date()
             newEx.title = "Title \(UUID())"
+            newEx.color = index % 2 == 0 ? "red" : "blue"
         }
         do {
             try viewContext.save()

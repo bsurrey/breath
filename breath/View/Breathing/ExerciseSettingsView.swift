@@ -16,7 +16,7 @@ struct ExerciseSettingsView: View {
     @State private var themeColor: Color = .black
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 VStack(spacing: 20) {
                     Section {
@@ -59,7 +59,9 @@ struct ExerciseSettingsView: View {
                         }
                 }
             }
-            .navigationBarTitle("Settings", displayMode: .inline)
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .formStyle(.grouped)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {

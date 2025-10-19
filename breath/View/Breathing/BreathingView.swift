@@ -83,35 +83,16 @@ struct BreathingView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .bottomBar) {
-                Button {
-                    resetSession()
-                } label: {
-                    Image(systemName: "xmark")
-                }
-                .disabled(!isActive && currentRound == 0)
+                resetButton
 
                 Spacer()
 
-                Button {
-                    toggleBreathing()
-                } label: {
-                    Image(systemName: isActive ? "pause.fill" : "play.fill")
-                        .contentTransition(.symbolEffect(.replace))
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                .tint(!isActive ? themeColor : nil)
-                .sensoryFeedback(.impact(weight: .medium), trigger: isActive)
+                playPauseButton
+                    .frame(maxWidth: .infinity)
 
                 Spacer()
 
-                Button {
-                    addRound()
-                    addedRound.toggle()
-                } label: {
-                    Image(systemName: "plus.arrow.trianglehead.clockwise")
-                        .symbolEffect(.rotate, value: addedRound)
-                }
-                .disabled(totalRounds >= 15)
+                addRoundButton
             }
         }
         .sheet(isPresented: $showSettings) {
@@ -120,6 +101,51 @@ struct BreathingView: View {
         }
         .onAppear(perform: setup)
         .onDisappear(perform: cleanup)
+    }
+}
+
+// MARK: - Liquid Glass Controls
+private extension BreathingView {
+    @ViewBuilder
+    var resetButton: some View {
+        Button {
+            resetSession()
+        } label: {
+            Image(systemName: "xmark")
+        }
+        .disabled(!isActive && currentRound == 0)
+        .controlSize(.large)
+        .buttonStyle(.glassProminent)
+        .tint(themeColor)
+    }
+
+    @ViewBuilder
+    var playPauseButton: some View {
+        Button {
+            toggleBreathing()
+        } label: {
+            Image(systemName: isActive ? "pause.fill" : "play.fill")
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .controlSize(.large)
+        .sensoryFeedback(.impact(weight: .medium), trigger: isActive)
+        .buttonStyle(.glassProminent)
+        .tint(themeColor)
+    }
+
+    @ViewBuilder
+    var addRoundButton: some View {
+        Button {
+            addRound()
+            addedRound.toggle()
+        } label: {
+            Image(systemName: "plus.arrow.trianglehead.clockwise")
+                .symbolEffect(.rotate, value: addedRound)
+        }
+        .disabled(totalRounds >= 15)
+        .controlSize(.large)
+        .buttonStyle(.glass)
+        .tint(themeColor)
     }
 }
 

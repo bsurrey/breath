@@ -1,0 +1,31 @@
+# Xcode build artifacts
+DerivedData/
+build/
+
+# User-specific Xcode data
+xcuserdata/
+*.xcuserstate
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+
+# Obj-C / Swift Package artifacts
+*.xccheckout
+*.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# CocoaPods (unused, but keep ignored)
+Pods/
+
+# Fastlane and tooling
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+
+# macOS finder noise
+.DS_Store
+
+# Playgrounds and scratch spaces
+timeline.xctimeline
+playground.xcworkspace/

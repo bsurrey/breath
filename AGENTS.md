@@ -1,22 +1,21 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-The SwiftUI app source sits in `breath/`, with screens under `View/`, shared models and timers in the root, and Core Data helpers in `Controller/`. Asset catalogs and previews live in `breath/Assets` and `breath/Preview Content`. The Core Data model (`breath.xcdatamodeld`) backs the `PersistenceController`. Tests are split between `breathTests/` for unit coverage and `breathUITests/` for UI flows. Open `breath.xcodeproj` to inspect targets or adjust schemes.
+SwiftUI source lives under `breath/`, with feature views in `breath/View/` and shared models, timers, and helpers in the module root. Persistence utilities sit in `breath/Controller/`, and the Core Data schema is defined in `breath.xcdatamodeld`. Static assets and preview fixtures are under `breath/Assets` and `breath/Preview Content`. XCTest bundles live in `breathTests/` for unit coverage and `breathUITests/` for UI scenarios. Open `breath.xcodeproj` to inspect schemes or tweak targets.
 
 ## Build, Test, and Development Commands
-- `open breath.xcodeproj` — launch the project in Xcode with the default `breath` scheme.
-- `xcodebuild -project breath.xcodeproj -scheme breath -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 15" build` — headless build that matches CI expectations.
-- `xcodebuild -project breath.xcodeproj -scheme breathTests -sdk iphonesimulator test` — run XCTest bundles (includes UI tests when the simulator destination is provided).
-- For localized previews, run `xcrun simctl boot "iPhone 15"` ahead of UI test execution.
+- `open breath.xcodeproj` — launches the project in Xcode with the default `breath` scheme for interactive dev.
+- `xcodebuild -project breath.xcodeproj -scheme breath -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 15" build` — CI-equivalent simulator build.
+- `xcodebuild -project breath.xcodeproj -scheme breathTests -sdk iphonesimulator test` — runs unit and UI tests; boot the target simulator with `xcrun simctl boot "iPhone 15"` beforehand.
 
 ## Coding Style & Naming Conventions
-Follow Swift 5 defaults with four-space indentation and lint-friendly `MARK:` sections (see `ResumableTimer.swift`). Use `UpperCamelCase` for types and view structs (`MainView`, `ExercisesView`), `lowerCamelCase` for variables and functions, and prefix view state with context (e.g., `breathingPhaseTimer`). Keep SwiftUI body builders short and extract subviews into `View/` when they exceed ~120 lines. Prefer value types (`struct`) for UI and keep side-effecting logic in helpers or controllers.
+Follow Swift 5 defaults with four-space indentation. Use `UpperCamelCase` for types and extracted views (`MainView`, `ExercisesView`) and `lowerCamelCase` for properties, functions, and state (e.g., `breathingPhaseTimer`). Keep SwiftUI bodies brief by extracting subviews once they exceed ~120 lines. Organize large files with `// MARK:` sections mirroring `ResumableTimer.swift`. Prefer value types for UI and isolate side effects in controllers or helpers.
 
 ## Testing Guidelines
-Use XCTest (`breathTests.swift`) for unit coverage and `XCTestCase` UI suites in `breathUITests`. Name tests with the `test_<Condition>_<Expectation>` pattern, mirroring the target (e.g., `testExerciseFlowCompletes`). Ensure new logic has deterministic unit coverage and add UI tests for navigation regressions. Run the `xcodebuild … test` command before submitting; target a minimum of 80% coverage on new features and attach simulator logs when diagnosing failures.
+Author deterministic XCTest cases in `breathTests/` and UI flows in `breathUITests/`. Name tests using `test_<Condition>_<Expectation>` (e.g., `testExerciseFlowCompletes`). Target ≥80% coverage on new work and run the simulator-backed `xcodebuild … test` command before submitting. Attach relevant simulator logs when diagnosing failures.
 
 ## Commit & Pull Request Guidelines
-Commits follow short, lower-case summaries (see `git log`: “ui improvements”). Keep each commit scoped to a feature or fix and use the imperative mood when possible (“add breathing presets”). Pull requests should include: a concise summary, linked issue or ticket, simulator screenshots for UI changes, reproduction steps for bug fixes, and a checklist of tests executed. Flag Core Data schema or timer behavior changes explicitly so reviewers can re-run affected flows.
+Commit summaries are short, lowercase, and imperative (e.g., `add breathing presets`). Keep each commit focused on a single fix or feature. Pull requests should include a concise summary, linked issue or ticket, and screenshots for UI updates. Document reproduction steps for bug fixes, list tests executed, and call out Core Data schema or timer-behavior changes so reviewers can re-run affected flows.
 
 ## Data & Configuration Notes
-Persistence is centralized in `Controller/Persistence.swift` using `NSPersistentCloudKitContainer`. Update the `breath` data model and regenerate managed object subclasses together. For Core Data previews, seed sample entities via `PersistenceController.preview` and keep UUID generation consistent with production initializers. When adding configuration, prefer `Info.plist` entries over hard-coded strings and document secrets management before committing.
+`PersistenceController` centralizes CloudKit-backed storage. Update `breath` data model files and regenerate managed object subclasses together to avoid runtime mismatches. Seed previews with `PersistenceController.preview`, mirroring production UUID patterns. Prefer `Info.plist` keys or configuration files over hard-coded secrets, and document any credential handling before merging.

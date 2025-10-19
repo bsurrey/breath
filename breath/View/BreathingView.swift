@@ -119,13 +119,14 @@ struct BreathingView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .bottomBar) {
-                GlassEffectContainer(spacing: 24) {
                     Button {
                         resetSession()
                     } label: {
                         Image(systemName: "xmark")
                     }
                     .disabled(!isActive && currentRound == 0)
+                    
+                    Spacer()
                     
                     // Play/Pause
                     Button {
@@ -134,12 +135,20 @@ struct BreathingView: View {
                         Image(systemName: isActive ? "pause.fill" : "play.fill")
                             .contentTransition(.symbolEffect(.replace))
                     }
-                    .buttonStyle(.glassProminent)
-                    .tint(themeColor)
+					.frame(
+						maxWidth: .infinity,
+						maxHeight: .infinity,
+						alignment: .center
+					)
+					.tint(!isActive ? themeColor : nil)
+					
+                    //.tint(themeColor)
                     //.glassButtonStyleProminent()
                     .sensoryFeedback(.impact(weight: .medium), trigger: isActive)
+					//.frame(width: .infinity)
+					
                     
-                    //.frame(width: 60, height: 60)
+                    Spacer()
                     
                     // Add round
                     Button {
@@ -150,8 +159,6 @@ struct BreathingView: View {
                             .symbolEffect(.rotate, value: addedRound)
                     }
                     .disabled(totalRounds >= 15)
-                    .tint(themeColor)
-                }
             }
         }
         .sheet(isPresented: $showSettings) {
@@ -200,7 +207,7 @@ struct BreathingView: View {
         ZStack {
             // Progress ring
             Circle()
-                .stroke(themeColor.opacity(0.12), lineWidth: 6)
+                .stroke(themeColor.opacity(0.12), lineWidth: 0)
                 .frame(width: 300, height: 300)
             
             
@@ -214,13 +221,13 @@ struct BreathingView: View {
                 .rotationEffect(.degrees(-90))
             
             // Animated particles
-            ForEach(0..<8, id: \.self) { index in
+            ForEach(0..<0, id: \.self) { index in
                 Circle()
                     .fill(themeColor.opacity(0.3))
                     .frame(width: 8, height: 8)
-                    .offset(y: -120)
-                    .rotationEffect(.degrees(Double(index) * 45 + particleRotation))
-                    .blur(radius: 2)
+                    .offset(y: 120)
+                    .rotationEffect(.degrees(Double(index) * 8 + particleRotation))
+                    .blur(radius: 0)
                 
             }
             
@@ -282,7 +289,7 @@ struct BreathingView: View {
             }
             .glassEffect()
             .scaleEffect(orbScale)
-            .glassBackground(tint: themeColor, isCircle: true)
+            //.glassBackground(tint: themeColor, isCircle: true)
         }
     }
     
@@ -303,59 +310,6 @@ struct BreathingView: View {
                     .animation(.spring(duration: 0.4, bounce: 0.4), value: currentRound)
             }
         }
-    }
-    
-    // MARK: - Control Bar
-    private var controlBar: some View {
-        HStack(spacing: 28) {
-            // Reset
-            Button {
-                resetSession()
-            } label: {
-                Image(systemName: "arrow.counterclockwise")
-                    .font(.system(size: 20, weight: .semibold))
-                    .frame(width: 54, height: 54)
-            }
-            .tint(themeColor)
-            .glassButtonStyle()
-            .disabled(!isActive && currentRound == 0)
-            
-            Spacer()
-            
-            // Play/Pause
-            Button {
-                toggleBreathing()
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(themeColor.opacity(0.18))
-                        .frame(width: 72, height: 72)
-                    
-                    Image(systemName: isActive ? "pause.fill" : "play.fill")
-                        .font(.system(size: 26, weight: .bold))
-                        .contentTransition(.symbolEffect(.replace))
-                }
-            }
-            .tint(themeColor)
-            .glassButtonStyleProminent()
-            .sensoryFeedback(.impact(weight: .medium), trigger: isActive)
-            
-            Spacer()
-            
-            // Add round
-            Button {
-                addRound()
-            } label: {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 20, weight: .semibold))
-                    .frame(width: 54, height: 54)
-            }
-            .tint(themeColor)
-            .glassButtonStyle()
-        }
-        .padding(.horizontal, 32)
-        .padding(.vertical, 16)
-        .background(.ultraThinMaterial)
     }
     
     // MARK: - Setup & Lifecycle

@@ -44,7 +44,7 @@
 
 /* Begin PBXFileReference section */
 		43020DAC2A06A12E00A9236B /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		43020DB12A06A8EC00A9236B /* BreathingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingView.swift; sourceTree = "<group>"; };
+		43020DB12A06A8EC00A9236B /* BreathingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingView.swift; sourceTree = "<group>"; usesTabs = 1; };
 		43020DB32A0728F500A9236B /* CardPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPreviewView.swift; sourceTree = "<group>"; };
 		4305AC2B2A05AAB900BCCCD8 /* breath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breath.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4305AC2E2A05AAB900BCCCD8 /* breathApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = breathApp.swift; sourceTree = "<group>"; };

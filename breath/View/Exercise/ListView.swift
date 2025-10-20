@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ListView: View {
     public var exercises: FetchedResults<Exercise>
-    
+
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 20) {
@@ -22,14 +23,13 @@ struct ListView: View {
                                 Label("Mute", systemImage: "bell.slash.fill")
                             }
                             .tint(.indigo)
-                            
+
                             Button(role: .destructive) {
                                 print("Deleting conversation")
                             } label: {
                                 Label("Delete", systemImage: "trash.fill")
                             }
                         }
-                    
                 }
             }
         }

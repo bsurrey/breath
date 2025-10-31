@@ -10,6 +10,7 @@ import SwiftData
 
 struct ListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @AppStorage(SettingsKey.usePerExerciseColors) private var usePerExerciseColors = true
     @AppStorage(SettingsKey.defaultCardColor) private var defaultCardColorHex = DefaultCardColor.default.hexString
     var exercises: [Exercise]
@@ -27,7 +28,13 @@ struct ListView: View {
                         themeColor: themeColor(for: exercise)
                     )
                 }
-                .listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .accessibilityHint("Opens the breathing exercise")
+                .listRowInsets(.init(
+                    top: dynamicTypeSize.isAccessibilitySize ? 12 : 8,
+                    leading: dynamicTypeSize.isAccessibilitySize ? 20 : 16,
+                    bottom: dynamicTypeSize.isAccessibilitySize ? 12 : 8,
+                    trailing: dynamicTypeSize.isAccessibilitySize ? 20 : 16
+                ))
                 .listRowSeparator(.hidden, edges: .all)
                 .listRowBackground(Color.clear)
                 .swipeActions(allowsFullSwipe: false) {
@@ -37,6 +44,8 @@ struct ListView: View {
                     } label: {
                         Label("Delete", systemImage: "trash.fill")
                     }
+                    .accessibilityLabel(Text("Delete \(exercise.title)"))
+                    .accessibilityHint(Text("Deletes this exercise"))
                 }
             }
         }
@@ -118,10 +127,19 @@ struct ListView: View {
 private struct ExerciseListRow: View {
     let exercise: Exercise
     let themeColor: Color
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var approximateMinutes: Int {
         let totalSeconds = (exercise.breathingInDuration + exercise.breathingOutDuration) * Double(exercise.repetitions)
         return Int(ceil(totalSeconds / 60.0))
+    }
+
+    private var accessibilitySummary: String {
+        let inSeconds = Int(exercise.breathingInDuration.rounded())
+        let outSeconds = Int(exercise.breathingOutDuration.rounded())
+        let reps = exercise.repetitions
+        let minutes = approximateMinutes
+        return "\(exercise.title). Breathe in \(inSeconds) seconds, out \(outSeconds) seconds, \(reps) repetitions, approximately \(minutes) minutes."
     }
 
     private var gradient: LinearGradient {
@@ -140,41 +158,65 @@ private struct ExerciseListRow: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(exercise.title)
                     .font(.title3)
-                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
             }
 
-            HStack(spacing: 12) {
-                statLabel(
-                    icon: "arrow.up.right.and.arrow.down.left.circle.fill",
-                    text: formattedSeconds(exercise.breathingInDuration, suffix: "s")
-                )
-                
-                
-                Spacer()
-                
-                statLabel(
-                    icon: "arrow.down.left.and.arrow.up.right.circle.fill",
-                    text: formattedSeconds(exercise.breathingOutDuration, suffix: "s")
-                )
-                
-                Spacer()
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    statLabel(
+                        icon: "arrow.up.right.and.arrow.down.left.circle.fill",
+                        text: formattedSeconds(exercise.breathingInDuration, suffix: "s")
+                    )
 
-                statLabel(
-                    icon: "repeat.circle.fill",
-                    text: "\(exercise.repetitions) x"
-                )
-                
-                Spacer()
+                    statLabel(
+                        icon: "arrow.down.left.and.arrow.up.right.circle.fill",
+                        text: formattedSeconds(exercise.breathingOutDuration, suffix: "s")
+                    )
 
-                
-                statLabel(
-                    icon: "clock.fill",
-                    text: "~ \(approximateMinutes) min"
-                )
+                    statLabel(
+                        icon: "repeat.circle.fill",
+                        text: "\(exercise.repetitions) x"
+                    )
+
+                    statLabel(
+                        icon: "clock.fill",
+                        text: "~ \(approximateMinutes) min"
+                    )
+                }
+                .font(.body)
+            } else {
+                HStack(spacing: 12) {
+                    statLabel(
+                        icon: "arrow.up.right.and.arrow.down.left.circle.fill",
+                        text: formattedSeconds(exercise.breathingInDuration, suffix: "s")
+                    )
+
+                    Spacer()
+
+                    statLabel(
+                        icon: "arrow.down.left.and.arrow.up.right.circle.fill",
+                        text: formattedSeconds(exercise.breathingOutDuration, suffix: "s")
+                    )
+
+                    Spacer()
+
+                    statLabel(
+                        icon: "repeat.circle.fill",
+                        text: "\(exercise.repetitions) x"
+                    )
+
+                    Spacer()
+
+                    statLabel(
+                        icon: "clock.fill",
+                        text: "~ \(approximateMinutes) min"
+                    )
+                }
+                .font(.subheadline)
             }
-            .font(.subheadline)
         }
-        .padding(16)
+        .padding(dynamicTypeSize.isAccessibilitySize ? 20 : 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -183,6 +225,9 @@ private struct ExerciseListRow: View {
         )
         .foregroundStyle(.white)
         .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(accessibilitySummary))
+        .accessibilityHint(Text("Opens the exercise"))
     }
 
     private func statLabel(icon: String, text: String) -> some View {

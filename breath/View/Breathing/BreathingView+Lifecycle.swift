@@ -90,6 +90,17 @@ extension BreathingView {
         }
         #endif
     }
+    func removeRound() {
+        let nextValue = min(totalRounds - 1, 5)
+        guard nextValue != totalRounds else { return }
+        totalRounds = nextValue
+
+        #if os(iOS)
+        if exercise.animations {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
+        #endif
+    }
 
     // MARK: - Feedback hooks
     func handleRoundCompletion(isFinal: Bool) {

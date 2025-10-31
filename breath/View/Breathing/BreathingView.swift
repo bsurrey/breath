@@ -21,16 +21,156 @@ struct BreathingView: View {
     @State var glowIntensity: Double = 0.0
     @State var particleRotation: Double = 0.0
 
+    @State var phaseStartDate: Date? = nil
+    @State var phaseElapsed: TimeInterval = 0
+    @State var currentPhaseDuration: TimeInterval = 0
+
     // MARK: - Session State
     @State var isActive = false
     @State var currentRound = 0
     @State var totalRounds: Int = 5
-    @State var phaseTimer: Timer?
+
+    @State var animationTimer: Timer? = nil
+    private let holdDuration: TimeInterval = 1.5
 
     // MARK: - UI State
     @State var showSettings = false
     @State var themeColor: Color = .blue
     @State var addedRound = false
+
+    // MARK: - Timing & Control Helpers
+    func durationForCurrentPhase() -> TimeInterval {
+        switch breathingPhase {
+        case .ready:
+            return 1.0
+        case .inhale:
+            return exercise.breathingInDuration
+        case .hold:
+            return holdDuration
+        case .exhale:
+            return exercise.breathingOutDuration
+        default:
+            return 0.0
+        }
+    }
+
+    func startPhaseIfNeeded() {
+        // Initialize timing values when (re)starting a phase
+        if phaseStartDate == nil {
+            currentPhaseDuration = durationForCurrentPhase()
+            phaseStartDate = Date().addingTimeInterval(-phaseElapsed)
+        }
+        startAnimationTimer()
+    }
+
+    func startAnimationTimer() {
+        animationTimer?.invalidate()
+        guard isActive else { return }
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
+            tick()
+        }
+        RunLoop.main.add(animationTimer!, forMode: .common)
+    }
+
+    func stopAnimationTimer() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+
+    func tick() {
+        guard isActive, let start = phaseStartDate else { return }
+        let elapsed = Date().timeIntervalSince(start)
+        phaseElapsed = max(0, min(elapsed, currentPhaseDuration))
+        if currentPhaseDuration > 0 {
+            breathProgress = phaseElapsed / currentPhaseDuration
+        } else {
+            breathProgress = 1
+        }
+
+        updateVisualsForCurrentPhase()
+
+        if phaseElapsed >= currentPhaseDuration {
+            advancePhase()
+        }
+    }
+
+    func advancePhase() {
+        // Reset timing for next phase but keep play state
+        phaseStartDate = nil
+        phaseElapsed = 0
+        breathProgress = 0
+        switch breathingPhase {
+        case .ready:
+            breathingPhase = .inhale
+        case .inhale:
+            breathingPhase = .hold
+        case .hold:
+            breathingPhase = .exhale
+        case .exhale:
+            // Increment rounds when a full inhale+exhale completes
+            currentRound = min(currentRound + 1, totalRounds)
+            let isFinalRound = currentRound >= totalRounds
+            handleRoundCompletion(isFinal: isFinalRound)
+            if isFinalRound {
+                isActive = false
+                stopAnimationTimer()
+                // Reset to ready for next session
+                breathingPhase = .ready
+                handleSessionCompletion()
+                updateVisualsForCurrentPhase()
+                return
+            } else {
+                breathingPhase = .inhale
+            }
+        default:
+            isActive = false
+            stopAnimationTimer()
+            return
+        }
+        // Start next phase timing
+        currentPhaseDuration = durationForCurrentPhase()
+        updateVisualsForCurrentPhase()
+        startPhaseIfNeeded()
+    }
+
+    func pauseSession() {
+        // Stop timers but do not reset progress; keep phaseElapsed and breathProgress
+        stopAnimationTimer()
+    }
+
+    func resumeSession() {
+        // Resume from the same point by setting a start date offset by already elapsed time
+        phaseStartDate = Date().addingTimeInterval(-phaseElapsed)
+        startAnimationTimer()
+    }
+
+    func updateVisualsForCurrentPhase() {
+        let clampedProgress = max(0.0, min(breathProgress, 1.0))
+        let baseScale: CGFloat = 0.65
+        let peakScale: CGFloat = 0.95
+        let baseGlow: Double = 0.2
+        let peakGlow: Double = 1.0
+
+        switch breathingPhase {
+        case .ready:
+            orbScale = baseScale
+            glowIntensity = 0.0
+        case .inhale:
+            let factor = clampedProgress
+            orbScale = baseScale + (peakScale - baseScale) * CGFloat(factor)
+            glowIntensity = baseGlow + (peakGlow - baseGlow) * factor
+        case .hold:
+            orbScale = peakScale
+            glowIntensity = 0.85
+        case .exhale:
+            let factor = 1.0 - clampedProgress
+            orbScale = baseScale + (peakScale - baseScale) * CGFloat(factor)
+            glowIntensity = baseGlow + (peakGlow - baseGlow) * factor
+        default:
+            orbScale = baseScale
+            glowIntensity = 0.0
+        }
+    }
 
     var body: some View {
         ZStack {

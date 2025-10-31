@@ -10,24 +10,35 @@ import UIKit
 extension BreathingView {
     // MARK: - Setup & Lifecycle
     func setup() {
-        let color: Color
+        let resolvedColor: Color
         if usePerExerciseColors {
-            color = Color.fromRGB(
-                red: exercise.red,
-                green: exercise.green,
-                blue: exercise.blue
-            )
+            if !exercise.color.isEmpty {
+                resolvedColor = DefaultCardColor(hex: exercise.color).color
+            } else {
+                resolvedColor = Color.fromRGB(
+                    red: exercise.red,
+                    green: exercise.green,
+                    blue: exercise.blue
+                )
+            }
         } else {
-            color = DefaultCardColor(hex: defaultCardColorHex).color
+            resolvedColor = DefaultCardColor(hex: defaultCardColorHex).color
         }
 
-        themeColor = color
-        totalRounds = exercise.repetitions
+        themeColor = resolvedColor
+        totalRounds = max(1, min(exercise.repetitions, 15))
+        currentPhaseDuration = durationForCurrentPhase()
+        updateVisualsForCurrentPhase()
+        if isActive {
+            startPhaseIfNeeded()
+        }
         startAmbientAnimation()
     }
 
     func cleanup() {
-        phaseTimer?.invalidate()
+        isActive = false
+        stopAnimationTimer()
+        phaseStartDate = nil
     }
 
     private func startAmbientAnimation() {
@@ -39,41 +50,39 @@ extension BreathingView {
     // MARK: - Actions
     func toggleBreathing() {
         if isActive {
-            pauseBreathing()
+            isActive = false
+            pauseSession()
         } else {
-            startBreathing()
+            isActive = true
+            if phaseStartDate == nil && phaseElapsed == 0 && breathProgress == 0 {
+                startPhaseIfNeeded()
+            } else {
+                resumeSession()
+            }
         }
-    }
-
-    private func startBreathing() {
-        isActive = true
-        if breathingPhase == .ready {
-            currentRound = 0
-            breathingPhase = .inhale
-        }
-        animateBreathCycle()
-    }
-
-    private func pauseBreathing() {
-        isActive = false
-        phaseTimer?.invalidate()
     }
 
     func resetSession() {
         isActive = false
-        phaseTimer?.invalidate()
-        currentRound = 0
         breathingPhase = .ready
-
-        withAnimation(.spring(duration: 0.8, bounce: 0.3)) {
-            breathProgress = 0
+        currentRound = 0
+        phaseStartDate = nil
+        phaseElapsed = 0
+        breathProgress = 0
+        currentPhaseDuration = durationForCurrentPhase()
+        stopAnimationTimer()
+        withAnimation(.spring(duration: 0.6, bounce: 0.25)) {
             orbScale = 0.65
-            glowIntensity = 0
+            glowIntensity = 0.0
         }
+        particleRotation = 0.0
+        updateVisualsForCurrentPhase()
     }
 
     func addRound() {
-        totalRounds += 1
+        let nextValue = min(totalRounds + 1, 15)
+        guard nextValue != totalRounds else { return }
+        totalRounds = nextValue
 
         #if os(iOS)
         if exercise.animations {
@@ -82,82 +91,28 @@ extension BreathingView {
         #endif
     }
 
-    // MARK: - Breathing Animation
-    private func animateBreathCycle() {
-        guard isActive else { return }
-
-        let inhale = max(exercise.breathingInDuration, 1.0)
-        let exhale = max(exercise.breathingOutDuration, 1.0)
-        let hold = 1.5
-
-        switch breathingPhase {
-        case .ready:
-            breathingPhase = .inhale
-            animateBreathCycle()
-
-        case .inhale:
-        withAnimation(.spring(duration: inhale, bounce: 0.15)) {
-            orbScale = 0.95
-            glowIntensity = 1.0
-            breathProgress = 1.0
-        }
-
-        phaseTimer = Timer.scheduledTimer(withTimeInterval: inhale, repeats: false) { _ in
-            breathingPhase = .hold
-            animateBreathCycle()
-        }
-
-        case .hold:
-            withAnimation(.spring(duration: hold, bounce: 0)) {
-                orbScale = 0.95
-                glowIntensity = 0.85
-            }
-
-        phaseTimer = Timer.scheduledTimer(withTimeInterval: hold, repeats: false) { _ in
-            breathingPhase = .exhale
-            animateBreathCycle()
-        }
-
-        case .exhale:
-            withAnimation(.spring(duration: exhale, bounce: 0.15)) {
-                orbScale = 0.65
-                glowIntensity = 0.2
-                breathProgress = 0
-            }
-
-        phaseTimer = Timer.scheduledTimer(withTimeInterval: exhale, repeats: false) { _ in
-            currentRound += 1
-
-                #if os(iOS)
-                if exercise.animations {
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                }
-                #endif
-
-                if currentRound >= totalRounds {
-                    completeSession()
-                } else {
-                    breathingPhase = .inhale
-                    animateBreathCycle()
-                }
-            }
-        }
-    }
-
-    private func completeSession() {
-        isActive = false
-        breathingPhase = .ready
-
-        withAnimation(.spring(duration: 1.0, bounce: 0.35)) {
-            breathProgress = 0
-            orbScale = 0.65
-            glowIntensity = 0
-        }
-
+    // MARK: - Feedback hooks
+    func handleRoundCompletion(isFinal: Bool) {
         #if os(iOS)
-        if exercise.animations {
+        guard exercise.animations else { return }
+        if isFinal {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
+        } else {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }
         #endif
+    }
+
+    func handleSessionCompletion() {
+        currentPhaseDuration = durationForCurrentPhase()
+        phaseStartDate = nil
+        phaseElapsed = 0
+        withAnimation(.spring(duration: 0.8, bounce: 0.3)) {
+            breathProgress = 0
+            orbScale = 0.65
+            glowIntensity = 0.0
+        }
+        particleRotation = 0.0
+        updateVisualsForCurrentPhase()
     }
 }

@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 struct ExerciseSettingsView: View {
-    @EnvironmentObject var exercise: Exercise
-    @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) var managedObjectContext
+    @Bindable var exercise: Exercise
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     
     @State private var themeColor: Color = .black
     
@@ -52,7 +52,7 @@ struct ExerciseSettingsView: View {
                     Slider(value: Binding(get: {
                         Double(exercise.repetitions)
                     }, set: {
-                        exercise.repetitions = Int16($0)
+                        exercise.repetitions = Int($0)
                     }), in: 1...20, step: 1)
                         .onChange(of: exercise.repetitions) { _ in
                             saveExercise()
@@ -65,16 +65,17 @@ struct ExerciseSettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
             }
         }
     }
-    
+
     private func saveExercise() {
         do {
-            try managedObjectContext.save()
+            exercise.updatedTime = .now
+            try modelContext.save()
         } catch {
             // Handle the error appropriately in a production app
             print("Failed to save exercise: \(error)")

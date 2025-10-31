@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct CardView: View {
-    @Environment(\.managedObjectContext) private var viewContext
+    @AppStorage(SettingsKey.usePerExerciseColors) private var usePerExerciseColors = true
+    @AppStorage(SettingsKey.defaultCardColor) private var defaultCardColorHex = DefaultCardColor.default.hexString
     var exercise: Exercise
     
     var body: some View {
@@ -16,7 +17,7 @@ struct CardView: View {
             VStack(alignment: .leading, spacing: 10) {
                 VStack {
                     HStack {
-                        Text(exercise.title ?? "Exercise")
+                        Text(exercise.title)
                             .font(.body)
                             .multilineTextAlignment(.leading)
                             .lineLimit(1)
@@ -61,9 +62,17 @@ struct CardView: View {
             }
             .foregroundColor(.white)
             .padding()
-            .background(Color.fromRGB(red: exercise.red, green: exercise.green, blue: exercise.blue))
+            .background(accentColor)
             .cornerRadius(10)
             .frame(maxWidth: .infinity)
         }
+    }
+
+    private var accentColor: Color {
+        if usePerExerciseColors {
+            return Color.fromRGB(red: exercise.red, green: exercise.green, blue: exercise.blue)
+        }
+
+        return DefaultCardColor(hex: defaultCardColorHex).color
     }
 }

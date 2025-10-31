@@ -10,12 +10,19 @@ import UIKit
 extension BreathingView {
     // MARK: - Setup & Lifecycle
     func setup() {
-        themeColor = Color.fromRGB(
-            red: exercise.red,
-            green: exercise.green,
-            blue: exercise.blue
-        )
-        totalRounds = Int(exercise.repetitions)
+        let color: Color
+        if usePerExerciseColors {
+            color = Color.fromRGB(
+                red: exercise.red,
+                green: exercise.green,
+                blue: exercise.blue
+            )
+        } else {
+            color = DefaultCardColor(hex: defaultCardColorHex).color
+        }
+
+        themeColor = color
+        totalRounds = exercise.repetitions
         startAmbientAnimation()
     }
 

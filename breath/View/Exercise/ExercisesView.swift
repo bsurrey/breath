@@ -6,31 +6,55 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ExercisesView: View {
-    @State private var showingAddItemView = false
-    @Environment(\.managedObjectContext) private var viewContext
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Exercise.createdTime, ascending: true)],
-        animation: .default)
-    private var exercises: FetchedResults<Exercise>
+    @Query(
+        sort: [SortDescriptor(\Exercise.createdTime, order: .forward)],
+        animation: .default
+    )
+    private var exercises: [Exercise]
     
     var body: some View {
-        if exercises.isEmpty {
-            EmptyStateView()
-        } else {
-            ListView(exercises: exercises)
+        Group {
+            if exercises.isEmpty {
+                EmptyStateView()
+            } else {
+                ListView(exercises: exercises)
+            }
         }
     }
 }
 
+@MainActor
+private func makeExercisesPreviewContainer() -> ModelContainer {
+    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Exercise.self, configurations: configuration)
+    let context = container.mainContext
 
-struct ExercisesView_Previews: PreviewProvider {
-    static var previews: some View {
-        ExercisesView()
-            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-        
-        ExercisesView()
+    if (try? context.fetch(FetchDescriptor<Exercise>()))?.isEmpty ?? true {
+        for index in 0..<3 {
+            let color = Color(hue: Double(index) / 3.0, saturation: 0.65, brightness: 0.85)
+            let rgb = color.toRGB()
+            let exercise = Exercise(
+                title: "Preview Session \(index + 1)",
+                breathingInDuration: 4 + Double(index),
+                breathingOutDuration: 6 + Double(index),
+                repetitions: 5 + index,
+                animations: true,
+                red: rgb.red,
+                green: rgb.green,
+                blue: rgb.blue
+            )
+            context.insert(exercise)
+        }
+        try! context.save()
     }
+
+    return container
+}
+
+#Preview("Exercises list") {
+    ExercisesView()
+        .modelContainer(makeExercisesPreviewContainer())
 }

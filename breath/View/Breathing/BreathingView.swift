@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct BreathingView: View {
     // MARK: - Environment & Data
-    @Environment(\.managedObjectContext) private var viewContext
-    var exercise: Exercise
+    @AppStorage(SettingsKey.usePerExerciseColors) var usePerExerciseColors = true
+    @AppStorage(SettingsKey.defaultCardColor) var defaultCardColorHex = DefaultCardColor.default.hexString
+    @Bindable var exercise: Exercise
 
     // MARK: - Animation State
     @State var breathingPhase: BreathPhase = .ready
@@ -67,7 +69,7 @@ struct BreathingView: View {
             }
             .padding(.vertical, 20)
         }
-        .navigationTitle(exercise.title ?? "Breathe")
+        .navigationTitle(exercise.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -96,11 +98,16 @@ struct BreathingView: View {
             }
         }
         .sheet(isPresented: $showSettings) {
-            ExerciseSettingsView()
-                .environmentObject(exercise)
+            ExerciseSettingsView(exercise: exercise)
         }
         .onAppear(perform: setup)
         .onDisappear(perform: cleanup)
+        .onChange(of: usePerExerciseColors) { _ in
+            setup()
+        }
+        .onChange(of: defaultCardColorHex) { _ in
+            setup()
+        }
     }
 }
 
@@ -151,31 +158,43 @@ private extension BreathingView {
 
 // MARK: - Preview
 struct BreathingView_Previews: PreviewProvider {
-    static var previews: some View {
-        let result = PersistenceController(inMemory: true)
-        let viewContext = result.container.viewContext
+    @MainActor
+    static var previewContainer: ModelContainer = {
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(for: Exercise.self, configurations: configuration)
+        return container
+    }()
 
-        let exercise = Exercise(context: viewContext)
-        exercise.uuid = UUID()
-        exercise.animations = true
-        exercise.breathingInDuration = 4.0
-        exercise.breathingOutDuration = 6.0
-        exercise.color = ".blue"
-        exercise.createdTime = Date()
-        exercise.favorite = false
-        exercise.repetitions = 5
-        exercise.updatedTime = Date()
-        exercise.title = "Calm Breathing"
-
-        let rgb = Color.blue.toRGB()
-        exercise.red = rgb.red
-        exercise.blue = rgb.blue
-        exercise.green = rgb.green
-
-        return NavigationView {
-            BreathingView(exercise: exercise)
-                .environment(\.managedObjectContext, viewContext)
+    @MainActor
+    static var previewExercise: Exercise = {
+        let context = previewContainer.mainContext
+        if let existing = try? context.fetch(FetchDescriptor<Exercise>()).first {
+            return existing
         }
+
+        let defaultCard = DefaultCardColor(color: .blue)
+        let defaultColor = Color.blue.toRGB()
+        let exercise = Exercise(
+            title: "Calm Breathing",
+            breathingInDuration: 4.0,
+            breathingOutDuration: 6.0,
+            repetitions: 6,
+            animations: true,
+            red: defaultColor.red,
+            green: defaultColor.green,
+            blue: defaultColor.blue,
+            color: defaultCard.hexString
+        )
+        context.insert(exercise)
+        try! context.save()
+        return exercise
+    }()
+
+    static var previews: some View {
+        NavigationView {
+            BreathingView(exercise: previewExercise)
+        }
+        .modelContainer(previewContainer)
         .preferredColorScheme(.light)
     }
 }

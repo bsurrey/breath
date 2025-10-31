@@ -78,32 +78,6 @@ extension SettingsView {
     }
 }
 
-// MARK: - Subviews
-extension SettingsView {
-    var headerCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Image(systemName: "wind")
-                .font(.system(size: 30, weight: .semibold))
-                .frame(width: 58, height: 58)
-                .background(
-                    Rectangle()
-                        .fill(Color.accentColor.opacity(0.18))
-                )
-                .foregroundStyle(.primary)
-
-            Text("Tune your practice")
-                .font(.title3)
-                .fontWeight(.semibold)
-
-            Text("Adjust guidance, audio, and visuals to match the breathing routine you prefer.")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-    }
-}
-
 // MARK: - Appearance Helpers
 extension SettingsView {
     var shapeSelector: some View {

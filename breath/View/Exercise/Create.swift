@@ -6,20 +6,28 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddItemView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @AppStorage(SettingsKey.usePerExerciseColors) private var usePerExerciseColors = true
+    @AppStorage(SettingsKey.defaultCardColor) private var defaultCardColorHex = DefaultCardColor.default.hexString
     
     @State private var breathingInDuration: Double = 4.0
     @State private var breathingOutDuration: Double = 7.0
-    @State private var repetitions: Int16 = 11
+    @State private var repetitions: Int = 11
     @State private var title: String = ""
     @State private var bgColor = Color.blue
     @State private var activateAnimations: Bool = true
+
+    init() {
+        let storedHex = UserDefaults.standard.string(forKey: SettingsKey.defaultCardColor) ?? DefaultCardColor.default.hexString
+        _bgColor = State(initialValue: DefaultCardColor(hex: storedHex).color)
+    }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 Form {
                     Section {
@@ -50,7 +58,7 @@ struct AddItemView: View {
                         Slider(value: Binding(get: {
                             Double(repetitions)
                         }, set: {
-                            repetitions = Int16($0)
+                            repetitions = Int($0)
                         }), in: 1...20, step: 1)
                     }
                     .tint(bgColor)
@@ -58,6 +66,8 @@ struct AddItemView: View {
                     
                     Section {
                         ColorPicker("Color", selection: $bgColor, supportsOpacity: false)
+                            .disabled(!usePerExerciseColors)
+                            .opacity(usePerExerciseColors ? 1 : 0.4)
                     }
                     
                     Section {
@@ -71,51 +81,54 @@ struct AddItemView: View {
                     .tint(bgColor)
                 }
             }
-            .navigationBarTitle("New Exercises", displayMode: .inline)
+            .formStyle(.grouped)
+            .navigationTitle("New Exercise")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        // Save new item and dismiss the sheet
                         addItem()
-                        presentationMode.wrappedValue.dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
             }
         }
     }
-    
+
     private func addItem() {
-        withAnimation {
-            let newExercise = Exercise(context: viewContext)
-            newExercise.title = title.isEmpty ? "Exercise" : title
-            newExercise.animations = activateAnimations
-            newExercise.repetitions = repetitions <= 0 ? 1 : repetitions
-            newExercise.breathingInDuration = breathingInDuration <= 0 ? 1 :breathingInDuration
-            newExercise.breathingOutDuration = breathingOutDuration <= 0 ? 1 : breathingOutDuration
-            newExercise.updatedTime = Date()
-            newExercise.createdTime = Date()
-            newExercise.uuid = UUID()
-            
-            let rgb = bgColor.toRGB()
-            newExercise.red = rgb.red
-            newExercise.blue = rgb.blue
-            newExercise.green = rgb.green
-            
-            
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+        let clampedRepetitions = max(repetitions, 1)
+        let clampedIn = max(breathingInDuration, 1)
+        let clampedOut = max(breathingOutDuration, 1)
+
+        let effectiveColor: Color = usePerExerciseColors ? bgColor : DefaultCardColor(hex: defaultCardColorHex).color
+        let rgb = effectiveColor.toRGB()
+        let defaultColor = DefaultCardColor(color: effectiveColor)
+        let exercise = Exercise(
+            title: title.isEmpty ? "Exercise" : title,
+            breathingInDuration: clampedIn,
+            breathingOutDuration: clampedOut,
+            repetitions: clampedRepetitions,
+            animations: activateAnimations,
+            createdTime: .now,
+            updatedTime: .now,
+            red: rgb.red,
+            green: rgb.green,
+            blue: rgb.blue,
+            color: defaultColor.hexString
+        )
+
+        modelContext.insert(exercise)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            assertionFailure("Failed to save exercise: \(error)")
         }
     }
 }

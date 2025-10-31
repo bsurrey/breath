@@ -10,7 +10,7 @@ import SwiftUI
 struct CardPreviewView: View {
     @State private var breathingInDuration: Double = 4.0
     @State private var breathingOutDuration: Double = 7.0
-    @State private var repetitions: Int16 = 11
+    @State private var repetitions: Int = 11
     @State private var title: String = ""
     @State private var bgColor = Color.blue
     @State private var activateAnimations: Bool = true

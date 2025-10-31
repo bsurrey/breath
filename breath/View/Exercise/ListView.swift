@@ -14,7 +14,7 @@ struct ListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
+            LazyVStack(alignment: .leading, spacing: 12) {
                 ForEach(exercises) { exercise in
                     CardView(exercise: exercise)
                         .swipeActions(allowsFullSwipe: false) {

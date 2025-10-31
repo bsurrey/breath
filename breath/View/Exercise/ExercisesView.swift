@@ -16,12 +16,10 @@ struct ExercisesView: View {
     private var exercises: [Exercise]
     
     var body: some View {
-        Group {
-            if exercises.isEmpty {
-                EmptyStateView()
-            } else {
-                ListView(exercises: exercises)
-            }
+        if exercises.isEmpty {
+            EmptyStateView()
+        } else {
+            ListView(exercises: exercises)
         }
     }
 }

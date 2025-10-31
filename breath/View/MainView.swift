@@ -18,17 +18,15 @@ struct MainView: View {
                 .navigationTitle("Mindful Exercises")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItemGroup(placement: .bottomBar) {
+                    ToolbarItemGroup(placement: .topBarLeading) {
                         Button {
                             showingSettings = true
                         } label: {
                             Label("Settings", systemImage: "gearshape")
                         }
-                        
-                        
-                        
-                        Spacer()
-                        
+                    }
+                    
+                    ToolbarItemGroup(placement: .bottomBar) {
                         Button {
                             showingAddItemView = true
                         } label: {

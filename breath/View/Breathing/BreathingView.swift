@@ -81,13 +81,8 @@ struct BreathingView: View {
         guard isActive, let start = phaseStartDate else { return }
         let elapsed = Date().timeIntervalSince(start)
         phaseElapsed = max(0, min(elapsed, currentPhaseDuration))
-        if currentPhaseDuration > 0 {
-            breathProgress = phaseElapsed / currentPhaseDuration
-        } else {
-            breathProgress = 1
-        }
-
-        updateVisualsForCurrentPhase()
+        let phaseProgress = currentPhaseDuration > 0 ? phaseElapsed / currentPhaseDuration : 1
+        updateVisualsForCurrentPhase(phaseProgress: phaseProgress)
 
         if phaseElapsed >= currentPhaseDuration {
             advancePhase()
@@ -98,7 +93,6 @@ struct BreathingView: View {
         // Reset timing for next phase but keep play state
         phaseStartDate = nil
         phaseElapsed = 0
-        breathProgress = 0
         switch breathingPhase {
         case .ready:
             breathingPhase = .inhale
@@ -144,8 +138,32 @@ struct BreathingView: View {
         startAnimationTimer()
     }
 
-    func updateVisualsForCurrentPhase() {
-        let clampedProgress = max(0.0, min(breathProgress, 1.0))
+    func updateVisualsForCurrentPhase(phaseProgress: Double? = nil) {
+        let rawProgress: Double
+        if let phaseProgress {
+            rawProgress = max(0.0, min(phaseProgress, 1.0))
+        } else if currentPhaseDuration > 0 {
+            rawProgress = max(0.0, min(phaseElapsed / currentPhaseDuration, 1.0))
+        } else {
+            rawProgress = 1.0
+        }
+
+        let effectiveProgress: Double
+        switch breathingPhase {
+        case .ready:
+            effectiveProgress = 0.0
+        case .inhale:
+            effectiveProgress = rawProgress
+        case .hold:
+            effectiveProgress = 1.0
+        case .exhale:
+            effectiveProgress = 1.0 - rawProgress
+        default:
+            effectiveProgress = 0.0
+        }
+
+        breathProgress = effectiveProgress
+
         let baseScale: CGFloat = 0.65
         let peakScale: CGFloat = 0.95
         let baseGlow: Double = 0.2
@@ -155,17 +173,13 @@ struct BreathingView: View {
         case .ready:
             orbScale = baseScale
             glowIntensity = 0.0
-        case .inhale:
-            let factor = clampedProgress
+        case .inhale, .exhale:
+            let factor = effectiveProgress
             orbScale = baseScale + (peakScale - baseScale) * CGFloat(factor)
             glowIntensity = baseGlow + (peakGlow - baseGlow) * factor
         case .hold:
             orbScale = peakScale
             glowIntensity = 0.85
-        case .exhale:
-            let factor = 1.0 - clampedProgress
-            orbScale = baseScale + (peakScale - baseScale) * CGFloat(factor)
-            glowIntensity = baseGlow + (peakGlow - baseGlow) * factor
         default:
             orbScale = baseScale
             glowIntensity = 0.0

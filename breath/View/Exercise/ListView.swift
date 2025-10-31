@@ -13,6 +13,8 @@ struct ListView: View {
     @AppStorage(SettingsKey.usePerExerciseColors) private var usePerExerciseColors = true
     @AppStorage(SettingsKey.defaultCardColor) private var defaultCardColorHex = DefaultCardColor.default.hexString
     var exercises: [Exercise]
+    @State private var exercisePendingDeletion: Exercise?
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         List {
@@ -26,31 +28,37 @@ struct ListView: View {
                     )
                 }
                 .listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                    .swipeActions(allowsFullSwipe: false) {
-                        Button {
-                            exercise.animations.toggle()
-                            try? modelContext.save()
-                        } label: {
-                            Label("Mute", systemImage: "bell.slash.fill")
-                        }
-                        .tint(.indigo)
-
-                        Button(role: .destructive) {
-                            withAnimation {
-                                modelContext.delete(exercise)
-                                try? modelContext.save()
-                            }
-                        } label: {
-                            Label("Delete", systemImage: "trash.fill")
-                        }
+                .listRowSeparator(.hidden, edges: .all)
+                .listRowBackground(Color.clear)
+                .swipeActions(allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        exercisePendingDeletion = exercise
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash.fill")
                     }
+                }
             }
         }
+        .navigationLinkIndicatorVisibility(.hidden)
         .listStyle(.plain)
-        .applyListRowSpacing(12)
         .scrollContentBackground(.hidden)
+        .confirmationDialog(
+            "Delete Exercise?",
+            isPresented: $showDeleteConfirmation,
+            presenting: exercisePendingDeletion
+        ) { exercise in
+            Button("Delete", role: .destructive) {
+                delete(exercise)
+            }
+        } message: { exercise in
+            Text("Are you sure you want to delete \"\(exercise.title)\"?")
+        }
+        .onChange(of: showDeleteConfirmation) { isShowing in
+            if !isShowing {
+                exercisePendingDeletion = nil
+            }
+        }
     }
 
     private func themeColor(for exercise: Exercise) -> Color {
@@ -63,6 +71,14 @@ struct ListView: View {
 
         return DefaultCardColor(hex: defaultCardColorHex).color
     }
+
+    private func delete(_ exercise: Exercise) {
+        withAnimation {
+            modelContext.delete(exercise)
+            try? modelContext.save()
+        }
+        exercisePendingDeletion = nil
+    }
 }
 
 #Preview {
@@ -72,7 +88,7 @@ struct ListView: View {
         let context = container.mainContext
 
         for index in 0..<4 {
-            let tint = Color(hue: Double(index) / 4.0, saturation: 0.6, brightness: 0.85)
+            let tint = Color(hue: Double(index) / 4.0, saturation: 0.6, brightness: 1)
             let rgb = tint.toRGB()
             let exercise = Exercise(
                 title: "Sample \(index + 1)",
@@ -123,32 +139,37 @@ private struct ExerciseListRow: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 Text(exercise.title)
-                    .font(.headline)
+                    .font(.title3)
                     .lineLimit(1)
-                Spacer()
-                Label {
-                    Text("~ \(approximateMinutes) min")
-                } icon: {
-                    Image(systemName: "clock")
-                }
-                .font(.subheadline)
-                .foregroundStyle(Color.white.opacity(0.85))
             }
 
             HStack(spacing: 12) {
                 statLabel(
-                    icon: "arrow.down.circle",
-                    text: formattedSeconds(exercise.breathingInDuration, suffix: "s in")
+                    icon: "arrow.up.right.and.arrow.down.left.circle.fill",
+                    text: formattedSeconds(exercise.breathingInDuration, suffix: "s")
                 )
-                Spacer(minLength: 8)
+                
+                
+                Spacer()
+                
                 statLabel(
-                    icon: "arrow.up.circle",
-                    text: formattedSeconds(exercise.breathingOutDuration, suffix: "s out")
+                    icon: "arrow.down.left.and.arrow.up.right.circle.fill",
+                    text: formattedSeconds(exercise.breathingOutDuration, suffix: "s")
                 )
-                Spacer(minLength: 8)
+                
+                Spacer()
+
                 statLabel(
-                    icon: "repeat",
+                    icon: "repeat.circle.fill",
                     text: "\(exercise.repetitions) x"
+                )
+                
+                Spacer()
+
+                
+                statLabel(
+                    icon: "clock.fill",
+                    text: "~ \(approximateMinutes) min"
                 )
             }
             .font(.subheadline)
@@ -170,9 +191,9 @@ private struct ExerciseListRow: View {
         } icon: {
             Image(systemName: icon)
         }
+        .labelStyle(CustomLabel(spacing: 2))
         .foregroundStyle(Color.white.opacity(0.92))
         .lineLimit(1)
-        .minimumScaleFactor(0.85)
     }
 
     private func formattedSeconds(_ value: Double, suffix: String) -> String {
@@ -181,13 +202,14 @@ private struct ExerciseListRow: View {
     }
 }
 
-private extension View {
-    @ViewBuilder
-    func applyListRowSpacing(_ spacing: CGFloat) -> some View {
-        if #available(iOS 17.0, *) {
-            listRowSpacing(spacing)
-        } else {
-            self
+struct CustomLabel: LabelStyle {
+    var spacing: Double = 0.0
+    
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: spacing) {
+            configuration.icon
+            configuration.title
         }
     }
 }
+
